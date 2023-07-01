@@ -1,0 +1,164 @@
+//Description:This program outputs a menu for the user to select products off of.
+//Once the items are selected the program outputs total of the items selected,
+//taxes, and the items with the taxes added together. The program then asks the user
+//if they want another order. If so the loop continues, and if not the loop ends and
+//displays the final subtotal. The end also displays the item that was sold the most
+//with the quantity of how many were sold.
+
+#include<iostream>
+#include<cmath>
+#include<iomanip>
+using namespace std;
+
+int const SIZE=6;
+double const TAX=.0825;
+struct Item
+{
+    string itemName;
+    float price;
+    int count;
+};
+
+//***********************************************************
+// menu: Outputs the main menu of the vending machine.
+//
+//***********************************************************
+void menu()
+{
+    cout<<"VS App Menu"<<endl;
+    cout<<left
+        <<setw(4)<<"[1]"<<setw(25)<<"Moon Model Platinum"<<"$1099.00"<<endl
+        <<setw(4)<<"[2]"<<setw(25)<<"Earth Model Enamel"<<"$1299.00"<<endl
+        <<setw(4)<<"[3]"<<setw(25)<<"Mars Model Enamel"<<"$499.00"<<endl
+        <<setw(4)<<"[4]"<<setw(25)<<"Jupiter Model Enamel"<<"$799.00"<<endl
+        <<setw(4)<<"[5]"<<setw(25)<<"Sun Model Gold"<<"$999.00"<<endl
+        <<setw(4)<<"[6]"<<setw(25)<<"Saturn Model Silver"<<"$399.00"<<endl;
+
+    cout<<"Input the item numbers for the order, 0 to quit"<<endl;
+};
+
+//***********************************************************
+// total:Adds all of the users inputs and returns it to main.
+//
+// param-1: input,  the options chosen from the user.
+// param-2: model[], the array of items to calculate which was chosen from user.
+// param-3: aTotal, given as 0 from the main but then calculated to the users choices.
+// returns: Returns the complete total from an order.
+//***********************************************************
+double total(int input, Item model[], double aTotal)
+{
+    if(input !=0)
+        {
+            aTotal=aTotal+model[input-1].price;
+            model[input-1].count++;
+
+        }
+    return aTotal;
+}
+
+//***********************************************************
+// maxOrder: Finds the model that was bought the most.
+//
+// param-1: model[], sent so the function can access the .count
+// of the struct of array.
+// returns: The MAX struct array with the highest count.
+//***********************************************************
+int maxOrder(Item model[])
+{
+    int MAX=model[0].count;
+
+    for(int i=1; i<SIZE; i++)
+        {
+            if(model[i].count>MAX)
+                MAX=model[i].count;
+        }
+    return MAX;
+}
+
+//***********************************************************
+// maxName:Finds the correct name of the model with the highest .count.
+// and then outputs the name.
+//
+// param-1: model[], sent so the function can access the .count
+// of the struct of array.
+//***********************************************************
+void maxName(Item model[])
+{
+    int MAX=model[0].count;
+    int temp=0;
+
+    for(int i=0; i<SIZE; i++)
+        {
+            if(model[i].count>MAX)
+            {
+                MAX=model[i].count;
+                temp=i;
+            }
+        }
+    cout<<model[temp].itemName;
+}
+
+
+int main()
+{
+    int input;
+    char endInput;
+    double aTotal=0;
+    double overallTotal=0;
+    int index=0;
+    int errorIndex=0;
+    bool error=true;
+
+    Item model[SIZE]={
+            {"Moon Model Platinum", 1099.00, 0}, {"Earth Model Enamel", 1299.00, 0},
+            {"Mars Model Enamel", 499.00, 0}, {"Jupiter Model Enamel", 799.00, 0},
+            {"Sun Model Gold", 999.00, 0}, {"Saturn Model Silver", 399.00, 0}
+                    };
+    do{
+        menu();
+        do{
+            cin>>input;
+            if(input<=-1 || input>=7)
+            {
+                errorIndex=input;
+                error=false;
+            }
+            else
+            {
+                aTotal=total(input, model, aTotal);
+            }
+        }while(input !=0);
+
+                    overallTotal=overallTotal+(aTotal*(TAX+1));
+
+    if(error=true && errorIndex!=0)
+        {
+            cout<<"** Error: There is no item "<< errorIndex<< " **"<<endl;
+            cout<<"Processing other items..."<<endl;
+            errorIndex=0;
+        }
+
+        cout<<"Subtotal...$"<<fixed<<setprecision(2)<<aTotal<<endl
+            <<"Tax........$"<<fixed<<setprecision(2)<<(aTotal*TAX)<<endl
+            <<"Total......$"<<fixed<<setprecision(2)<<(aTotal*(TAX+1))<<endl<<endl
+            <<"Please enter 'N' to take a new order or 'E' to exit: ";
+         cin>>endInput;
+         cout<<endl;
+
+        if(endInput=='N')
+        {
+            aTotal=0;
+        }
+
+    }while(endInput !='E');
+
+    cout<<"*** End of Day Totals ***"<<endl
+        <<"Total sales: $"<<overallTotal<<endl
+        <<"Item orderd the most often: ";
+        index=maxOrder(model);
+        maxName(model);
+    cout<<" purchased "<<index<<" times"<<endl;
+    cout<<"*** *** ***   *** *** ***";
+
+    return 0;
+}
